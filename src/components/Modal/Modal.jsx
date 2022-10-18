@@ -20,6 +20,7 @@ export const Modal = ({ img, closeModal }) => {
     return () => {
       window.removeEventListener('keydown', closeByEscape);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className={css.overlay} onClick={closeByBackdrop}>
