@@ -30,6 +30,7 @@ export const App = () => {
           setError('nothing found');
         }
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, page]);
 
   const newSearch = newName => {
