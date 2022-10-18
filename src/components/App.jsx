@@ -6,7 +6,7 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
 
-export const App = ({ newName }) => {
+export const App = () => {
   const [data, setData] = useState([]);
   const [name, setName] = useState('');
   const [page, setPage] = useState(1);
@@ -16,16 +16,13 @@ export const App = ({ newName }) => {
 
   useEffect(() => {
     console.log(name);
+    if (name === '') {
+      return;
+    }
     setIsLoading(true);
     fetchData(name, page)
       .then(resp => resp.json())
-      .then(newData =>
-        setData(prevData =>
-          prevData.name !== name
-            ? [...newData.hits]
-            : [...prevData.data, ...newData.hits]
-        )
-      )
+      .then(newData => setData(prevData => [...prevData, ...newData.hits]))
       .catch(error => setError(error.message))
       .finally(() => {
         setIsLoading(false);
@@ -33,7 +30,7 @@ export const App = ({ newName }) => {
           setError('nothing found');
         }
       });
-  }, [name]);
+  }, [name, page]);
 
   const newSearch = newName => {
     if (newName.trim().length === 0) {
