@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import Button from './Button/Button';
 import { fetchData } from 'api/api';
@@ -6,79 +6,69 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
 
-export class App extends Component {
-  state = {
-    data: [],
-    name: '',
-    page: 1,
-    isLoading: false,
-    error: '',
-    img: null,
-  };
+export const App = ({ newName }) => {
+  const [data, setData] = useState([]);
+  const [name, setName] = useState('');
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [img, setImg] = useState(null);
 
-  componentDidUpdate(_, prevState) {
-    const { name, page } = this.state;
-    if (prevState.page !== page || prevState.name !== name) {
-      this.setState({ isLoading: true });
-      fetchData(name, page)
-        .then(resp => resp.json())
-        .then(newData =>
-          this.setState(prevState => ({
-            data:
-              prevState.name !== name
-                ? [...newData.hits]
-                : [...prevState.data, ...newData.hits],
-          }))
+  useEffect(() => {
+    console.log(name);
+    setIsLoading(true);
+    fetchData(name, page)
+      .then(resp => resp.json())
+      .then(newData =>
+        setData(prevData =>
+          prevData.name !== name
+            ? [...newData.hits]
+            : [...prevData.data, ...newData.hits]
         )
-        .catch(error => this.setState({ error: error.message }))
-        .finally(() => {
-          this.setState({
-            isLoading: false,
-          });
-          if (this.state.data.length === 0) {
-            this.setState({ error: 'nothing found' });
-          }
-        });
-    }
-  }
+      )
+      .catch(error => setError(error.message))
+      .finally(() => {
+        setIsLoading(false);
+        if (data.length === 0) {
+          setError('nothing found');
+        }
+      });
+  }, [name]);
 
-  newSearch = name => {
-    if (name.trim().length === 0) {
+  const newSearch = newName => {
+    if (newName.trim().length === 0) {
       alert('Empty search field!!!');
       return;
     }
-    this.setState({ data: [], name: name, page: 1 });
+    setName(newName);
+    setData([]);
+    setPage(1);
   };
-  moreLoadButtonClick = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const moreLoadButtonClick = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  openModal = e => {
+  const openModal = e => {
     const img = e.target.dataset.url;
-    this.setState(prevState => ({ img }));
+    setImg(img);
   };
-  closeModal = () => {
-    this.setState({ img: null });
+  const closeModal = () => {
+    setImg(null);
   };
 
-  render() {
-    const { isLoading, img } = this.state;
-    return (
-      <>
-        <Searchbar getNewName={this.newSearch} />
-        {isLoading && <Loader />}
-        {this.state.data.length > 0 ? (
-          <ImageGallery images={this.state.data} openModal={this.openModal} />
-        ) : (
-          <h2 className="error">{this.state.error}</h2>
-        )}
-        {this.state.data.length >= 12 ? (
-          <Button moreLoadButtonClick={this.moreLoadButtonClick} />
-        ) : null}
-        {img && <Modal img={img} closeModal={this.closeModal} />}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Searchbar getNewName={newSearch} />
+      {isLoading && <Loader />}
+      {data.length > 0 ? (
+        <ImageGallery images={data} openModal={openModal} />
+      ) : (
+        <h2 className="error">{error}</h2>
+      )}
+      {data.length >= 12 ? (
+        <Button moreLoadButtonClick={moreLoadButtonClick} />
+      ) : null}
+      {img && <Modal img={img} closeModal={closeModal} />}
+    </>
+  );
+};

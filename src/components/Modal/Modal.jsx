@@ -1,42 +1,35 @@
-import React, { Component } from 'react';
+import { useEffect } from 'react';
 import css from './Modal.module.css';
 import { SlClose } from 'react-icons/sl';
 
-export class Modal extends Component {
-  closeByEscape = e => {
+export const Modal = ({ img, closeModal }) => {
+  useEffect(() => {
+    window.addEventListener('keydown', closeByEscape);
+    return () => window.removeEventListener('keydown', closeByEscape);
+  }, [closeModal]);
+
+  const closeByEscape = e => {
     if (e.code === 'Escape') {
-      this.props.closeModal();
+      closeModal();
     }
   };
 
-  closeByBackdrop = e => {
+  const closeByBackdrop = e => {
     if (e.currentTarget === e.target) {
-      this.props.closeModal();
+      closeModal();
     }
   };
-  componentDidMount() {
-    window.addEventListener('keydown', this.closeByEscape);
-  }
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.closeByEscape);
-  }
-  render() {
-    return (
-      <div className={css.overlay} onClick={this.closeByBackdrop}>
-        <div className={css.modal}>
-          <img src={this.props.img} alt="" />
-        </div>
-        <button
-          type="button"
-          className={css.button}
-          onClick={this.props.closeModal}
-        >
-          <SlClose />
-        </button>
+  return (
+    <div className={css.overlay} onClick={closeByBackdrop}>
+      <div className={css.modal}>
+        <img src={img} alt="" />
       </div>
-    );
-  }
-}
+      <button type="button" className={css.button} onClick={closeModal}>
+        <SlClose />
+      </button>
+    </div>
+  );
+};
 
 export default Modal;
