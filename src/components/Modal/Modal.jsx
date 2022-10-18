@@ -6,7 +6,7 @@ export const Modal = ({ img, closeModal }) => {
   useEffect(() => {
     window.addEventListener('keydown', closeByEscape);
     return () => window.removeEventListener('keydown', closeByEscape);
-  }, [closeModal]);
+  }, [closeModal, closeByEscape, closeByBackdrop]);
 
   const closeByEscape = e => {
     if (e.code === 'Escape') {
