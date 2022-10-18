@@ -3,11 +3,6 @@ import css from './Modal.module.css';
 import { SlClose } from 'react-icons/sl';
 
 export const Modal = ({ img, closeModal }) => {
-  useEffect(() => {
-    window.addEventListener('keydown', closeByEscape);
-    return () => window.removeEventListener('keydown', closeByEscape);
-  }, [closeModal, closeByEscape, closeByBackdrop]);
-
   const closeByEscape = e => {
     if (e.code === 'Escape') {
       closeModal();
@@ -20,6 +15,12 @@ export const Modal = ({ img, closeModal }) => {
     }
   };
 
+  useEffect(() => {
+    window.addEventListener('keydown', closeByEscape);
+    return () => {
+      window.removeEventListener('keydown', closeByEscape);
+    };
+  }, []);
   return (
     <div className={css.overlay} onClick={closeByBackdrop}>
       <div className={css.modal}>
